@@ -59,8 +59,8 @@ auth_channels     = environ.get("AUTH_CHANNELS", "-1002746408715")# Channels for
 # ============================
 # Payment Configuration
 # ============================
-QR_CODE = environ.get('QR_CODE', 'https://graph.org/file/e419f801841c2ee3db0fc.jpg')    # QR code image for payments
-OWNER_UPI_ID = environ.get('OWNER_UPI_ID', 'ɴᴏ ᴀᴠᴀɪʟᴀʙʟᴇ ʀɪɢʜᴛ ɴᴏᴡ')    # Owner UPI ID for payments
+QR_CODE = environ.get('QR_CODE', 'https://i.ibb.co/whHV3mLp/photo-2025-11-26-05-37-21-7576904037694439492.jpg')    # QR code image for payments
+OWNER_ID = environ.get('OWNER_ID', 'ɴᴏ ᴀᴠᴀɪʟᴀʙʟᴇ ʀɪɢʜᴛ ɴᴏᴡ')    # Owner UPI ID for payments
 
 STAR_PREMIUM_PLANS = {
     10: "7day",
@@ -84,11 +84,11 @@ DATABASE_URI2 = environ.get('DATABASE_URI2', "")  # MongoDB URI for the second d
 # Movie Notification & Update Settings
 # ============================
 MOVIE_UPDATE_NOTIFICATION = bool(environ.get('MOVIE_UPDATE_NOTIFICATION', False))  # Notification On (True) / Off (False)
-MOVIE_UPDATE_CHANNEL = int(environ.get('MOVIE_UPDATE_CHANNEL', '-100'))  # Notification of sent to your channel
+MOVIE_UPDATE_CHANNEL = int(environ.get('MOVIE_UPDATE_CHANNEL', '-1003356899562'))  # Notification of sent to your channel
 DREAMXBOTZ_IMAGE_FETCH = bool(environ.get('DREAMXBOTZ_IMAGE_FETCH', True))  # On (True) / Off (False)
 LINK_PREVIEW = bool(environ.get('LINK_PREVIEW', False)) # Shows link preview in notification msg instead of image
 ABOVE_PREVIEW = bool(environ.get('ABOVE_PREVIEW', True)) # Shows link preview above the text in notification msg if True else below the msg
-TMDB_API_KEY = environ.get('TMDB_API_KEY', '') # preffer to use your own tmdb API Key get it from https://www.themoviedb.org/settings/api
+TMDB_API_KEY = environ.get('TMDB_API_KEY', '7dc544d9253bccc3cfecc1c677f69819') # preffer to use your own tmdb API Key get it from https://www.themoviedb.org/settings/api
 TMDB_POSTER = bool(environ.get('TMDB_POSTER', True)) # Shows TMDB poster in notification msg
 LANDSCAPE_POSTER = bool(environ.get('LANDSCAPE_POSTER', True)) # Shows landscape poster in notification msg
 
