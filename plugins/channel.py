@@ -429,17 +429,13 @@ async def update_movie_message(bot, base_name):
     except Exception as e:
         logger.error(f"Failed to update movie message: {e}")
 
-def format_plot(text, width=30):
+# Updated to just clean text without adding borders, to fit new design
+def format_plot(text):
     if not text:
-        return "│ Story not available."
-    
-    # Truncate if too long
+        return "Story not available."
     if len(text) > 300:
-        text = text[:300] + "..."
-        
-    wrapper = textwrap.TextWrapper(width=width)
-    lines = wrapper.wrap(text)
-    return "\n".join([f"│ {line}" for line in lines])
+        return text[:300] + "..."
+    return text
 
 def generate_movie_message(movie_doc, base_name):
     all_qualities = set()
@@ -464,6 +460,8 @@ def generate_movie_message(movie_doc, base_name):
             episodes_by_season[season].add(episode)
 
     primary_tag = "#SERIES" if "#SERIES" in all_tags else "#MOVIE"
+    
+    # Updated Episode Block Logic for New Design
     epi_block = ""
     if episodes_by_season:
         episode_lines = []
@@ -495,7 +493,8 @@ def generate_movie_message(movie_doc, base_name):
                 collapsed.append(str(start) if start == end else f"{start}-{end}")
 
             all_ep_parts = collapsed + sorted(ranges, key=lambda s: int(s.split("-")[0]))
-            episode_lines.append(f"│ 📺 𝐒{int(season)}: {', '.join(all_ep_parts)}")
+            # Using '┠' to match the new design
+            episode_lines.append(f"┠ 📺 <b>Season {int(season)}:</b> {', '.join(all_ep_parts)}")
 
         epi_str = "\n".join(episode_lines)
         if epi_str:
@@ -505,26 +504,35 @@ def generate_movie_message(movie_doc, base_name):
     quality_str = ", ".join(sorted(all_qualities)) if all_qualities else "Unknown"
     language_str = ", ".join(sorted(all_languages)) if all_languages else "Unknown"
     year = movie_doc.get("year", "N/A")
-    plot_text = movie_doc.get("plot", "Story not available")
-    formatted_plot = format_plot(plot_text)
+    
+    # Rating Logic
+    rating = movie_doc.get("rating", "N/A")
+    if rating != "N/A":
+        rating = f"⭐️ {rating}/10"
 
-    # Custom Requested Format
+    # Plot Logic
+    plot_text = format_plot(movie_doc.get("plot", "Story not available"))
+
+    # New Premium Glass Format
     return f"""
-#𝑵𝒆𝒘_𝑪𝒐𝒏𝒕𝒆𝒏𝒕_𝑨𝒅𝒅𝒆𝒅 💌
+✨ <b>Just Arrived on Channel</b> ✨
 
-╭─━━━⌁ 𝘾𝙊𝙉𝙏𝙀𝙉𝙏 𝙄𝙉𝙁𝙊 ⌁━━━─╮
-│ 📂 𝐓𝐢𝐭𝐥𝐞: {base_name}
-│ 🎭 𝐆𝐞𝐧𝐫𝐞: {genres}
-│ 💎 𝐐𝐮𝐚𝐥𝐢𝐭𝐲: {quality_str}
-│ 🔊 𝐀𝐮𝐝𝐢𝐨: {language_str}
-│ 📅 𝐘𝐞𝐚𝐫: {year}{epi_block}
-├╌╌╌╌╌╌╌ 𝐒𝐓𝐎𝐑𝐘 ╌╌╌╌╌╌╌┤
-{formatted_plot}
-╰━━━━━━━━━━━━━━━━━━━━━╯
+┏━━━━━━━━━━━━━━━━━━━┫
+┃🎬 <b>Title:</b> {base_name}
+┃⭐️ <b>Rating:</b> {rating}
+┃🎭 <b>Genre:</b> {genres}
+┃📅 <b>Year:</b> {year}
+┗━━━━━━━━━━━━━━━━━━━┫
 
-╭─━━━━⌁ ᴇɴɢᴀɢᴇ ᴡɪᴛʜ ᴘᴏꜱᴛ ⌁━━━━─╮
-┃ ♡ 𝐋𝐢𝐤𝐞  ❍ 𝐂𝐨𝐦𝐦𝐞𝐧𝐭  ⎙ 𝐒𝐚𝐯𝐞  ⌲ 𝐒𝐡𝐚𝐫𝐞
-╰━━━━━━━━━━━━━━━━━━━━━━━━━╯
+<b>⚡️ Media Info:</b>
+┠ 🔊 <b>Languages:</b> {language_str}
+┠ 💿 <b>Quality:</b> {quality_str}
+┠ 📺 <b>Type:</b> {primary_tag.replace('#', '')}{epi_block if epi_block else ""}
 
-        ⬇️ Get File Below ⬇️
+<b>📖 Plot Summary:</b>
+❝ <i>{plot_text}</i> ❞
+
+───────────────
+  ❤ <b>React</b>  •  🔔 <b>Share</b>  •  📂 <b>Save</b>
+───────────────
 """
