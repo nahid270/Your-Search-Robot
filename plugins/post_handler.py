@@ -103,7 +103,16 @@ RESOLUTIONS = [
 ]
 
 OTT_PLATFORMS = [
-    
+    # Bangladeshi OTTs
+    "Chorki",
+    "Bioscope",
+    "Toffee",
+    "Bongo",
+    "iScreen",
+    "Deepto Play",
+    "Cinebaz",
+
+    # Indian OTTs
     "Aha",
     "ALTBalaji",
     "JioHotstar",
@@ -116,7 +125,7 @@ OTT_PLATFORMS = [
     "Voot",
     "Zee5",
 
-    
+    # International OTTs
     "Amazon Prime Video",  
     "Apple TV+",
     "Crunchyroll",
