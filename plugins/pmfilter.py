@@ -6,7 +6,7 @@ from urllib.parse import quote_plus
 import logging
 from database.ia_filterdb import Media, Media2, get_file_details, get_search_results, get_bad_files
 from database.config_db import mdb
-from database.notify_db import notify_db  # <--- NEW IMPORT
+from database.notify_db import notify_db
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid, ChatAdminRequired, UserNotParticipant
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, InputMediaPhoto, WebAppInfo
@@ -363,30 +363,42 @@ async def advantage_spoll_choker(bot, query):
     else:
         reqstr1 = query.from_user.id if query.from_user else 0
         reqstr = await bot.get_users(reqstr1)
-        if NO_RESULTS_MSG:
-            try:
-                # ------------------- LOG CHANNEL ADMIN BUTTONS (SPOL) -------------------
-                user_id = reqstr.id
-                user_mention = reqstr.mention
-                admin_btns = [
-                    [
-                        InlineKeyboardButton("✅ Uploaded", callback_data=f"uploaded#{user_id}"),
-                        InlineKeyboardButton("🚫 Not Released", callback_data=f"Not_Released#{user_id}")
-                    ],
-                    [
-                        InlineKeyboardButton("📝 Wrong Spelling", callback_data=f"Type_Correct_Spelling#{user_id}"),
-                        InlineKeyboardButton("❌ Unavailable", callback_data=f"unavailable#{user_id}")
-                    ]
+        
+        # ------------------- LOG CHANNEL LOGIC (FROM SPOLL) -------------------
+        try:
+            user_id = reqstr.id
+            user_mention = reqstr.mention
+            admin_btns = [
+                [
+                    InlineKeyboardButton("✅ Uploaded", callback_data=f"uploaded#{user_id}"),
+                    InlineKeyboardButton("🚫 Not Released", callback_data=f"Not_Released#{user_id}")
+                ],
+                [
+                    InlineKeyboardButton("📝 Wrong Spelling", callback_data=f"Type_Correct_Spelling#{user_id}"),
+                    InlineKeyboardButton("❌ Unavailable", callback_data=f"unavailable#{user_id}")
+                ],
+                [
+                    InlineKeyboardButton("♻️ Already Available", callback_data=f"already_available#{user_id}")
                 ]
-                await bot.send_message(
-                    chat_id=BIN_CHANNEL, 
-                    text=script.NORSLTS.format(user_id, user_mention, movie) + "\n\n👇 <b>Select Action:</b>",
-                    reply_markup=InlineKeyboardMarkup(admin_btns)
-                )
-            except Exception as e:
-                print(f"Error In Spol Log - {e}")
+            ]
+            
+            # Sending message to LOG_CHANNEL
+            await bot.send_message(
+                chat_id=LOG_CHANNEL, 
+                text=(
+                    f"<b>#Request_From_Suggestion</b>\n\n"
+                    f"👤 <b>User:</b> {user_mention}\n"
+                    f"🆔 <b>ID:</b> <code>{user_id}</code>\n"
+                    f"🎬 <b>Movie:</b> <code>{movie}</code>\n\n"
+                    f"⚠️ <i>User clicked on suggestion but file not in DB.</i>\n"
+                    f"👇 <b>Admin Action:</b>"
+                ),
+                reply_markup=InlineKeyboardMarkup(admin_btns)
+            )
+        except Exception as e:
+            print(f"Error In Spol Log - {e}")
 
-        # ------------------- NEW NOTIFY BUTTON FOR USER -------------------
+        # ------------------- NOTIFY BUTTON FOR USER -------------------
         btn = InlineKeyboardMarkup([
             [InlineKeyboardButton("🔔 Notify Me When Available 🔔", callback_data=f"notify_me#{movie}")],
             [InlineKeyboardButton("🔰Cʟɪᴄᴋ ʜᴇʀᴇ & ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴀᴅᴍɪɴ🔰", url=OWNER_LNK)]
@@ -2091,44 +2103,45 @@ async def advantage_spell_chok(client, message):
     if not movies:
         google = search.replace(" ", "+")
         
-        # ------------------- LOG CHANNEL ADMIN BUTTONS (NO RESULTS) -------------------
-        if NO_RESULTS_MSG:
-            try:
-                user_id = message.from_user.id
-                user_mention = message.from_user.mention
-                
-                # অ্যাডমিনদের জন্য কন্ট্রোল বাটন
-                admin_btns = [
-                    [
-                        InlineKeyboardButton("✅ Uploaded", callback_data=f"uploaded#{user_id}"),
-                        InlineKeyboardButton("🚫 Not Released", callback_data=f"Not_Released#{user_id}")
-                    ],
-                    [
-                        InlineKeyboardButton("📝 Wrong Spelling", callback_data=f"Type_Correct_Spelling#{user_id}"),
-                        InlineKeyboardButton("❌ Unavailable", callback_data=f"unavailable#{user_id}")
-                    ]
+        # ------------------- LOG CHANNEL SENDING LOGIC (NO RESULTS) -------------------
+        try:
+            user_id = message.from_user.id
+            user_mention = message.from_user.mention
+            
+            # Admin control buttons
+            admin_btns = [
+                [
+                    InlineKeyboardButton("✅ Uploaded", callback_data=f"uploaded#{user_id}"),
+                    InlineKeyboardButton("🚫 Not Released", callback_data=f"Not_Released#{user_id}")
+                ],
+                [
+                    InlineKeyboardButton("📝 Wrong Spelling", callback_data=f"Type_Correct_Spelling#{user_id}"),
+                    InlineKeyboardButton("❌ Unavailable", callback_data=f"unavailable#{user_id}")
+                ],
+                [
+                    InlineKeyboardButton("♻️ Already Available", callback_data=f"already_available#{user_id}")
                 ]
-                
-                # লগ চ্যানেলে মেসেজ পাঠানো
-                await client.send_message(
-                    chat_id=BIN_CHANNEL,
-                    text=(
-                        f"<b>#No_Results_Found</b>\n\n"
-                        f"👤 <b>User:</b> {user_mention}\n"
-                        f"🆔 <b>ID:</b> <code>{user_id}</code>\n"
-                        f"🔍 <b>Query:</b> {search}\n\n"
-                        f"👇 <b>Select Action for this User:</b>"
-                    ),
-                    reply_markup=InlineKeyboardMarkup(admin_btns)
-                )
-            except Exception as e:
-                print(f"Log Channel Error: {e}")
+            ]
+            
+            # Sending to LOG_CHANNEL
+            await client.send_message(
+                chat_id=LOG_CHANNEL,
+                text=(
+                    f"<b>#New_Request (No Results)</b>\n\n"
+                    f"👤 <b>User:</b> {user_mention}\n"
+                    f"🆔 <b>ID:</b> <code>{user_id}</code>\n"
+                    f"🔍 <b>Query:</b> <code>{search}</code>\n\n"
+                    f"👇 <b>Admin Action:</b>"
+                ),
+                reply_markup=InlineKeyboardMarkup(admin_btns)
+            )
+        except Exception as e:
+            print(f"Log Channel Error: {e}")
         # ------------------------------------------------------------------
 
-        # ------------------- NEW NOTIFY BUTTON -------------------
         button = [
             [InlineKeyboardButton("🔔 Notify Me When Available 🔔", callback_data=f"notify_me#{search}")],
-            [InlineKeyboardButton("🔍 ᴄʜᴇᴄᴋ sᴘᴇʟʟɪɴɢ ᴏɴ ɢᴏᴏɢʟᴇ 🔍", url=f"https://www.google.com/search?q={google}")]
+            [InlineKeyboardButton("🔍 Check Spelling On Google 🔍", url=f"https://www.google.com/search?q={google}")]
         ]
         k = await message.reply_text(text=script.I_CUDNT.format(search), reply_markup=InlineKeyboardMarkup(button))
         await asyncio.sleep(60)
