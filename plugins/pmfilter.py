@@ -2085,12 +2085,23 @@ async def advantage_spell_chok(client, message):
     search = message.text
     chat_id = message.chat.id
     settings = await get_settings(chat_id)
+    
+    # অপ্রয়োজনীয় শব্দ রিমুভ করা হচ্ছে
     query = re.sub(
         r"\b(pl(i|e)*?(s|z+|ease|se|ese|(e+)s(e)?)|((send|snd|giv(e)?|gib)(\sme)?)|movie(s)?|new|latest|br((o|u)h?)*|^h(e|a)?(l)*(o)*|mal(ayalam)?|t(h)?amil|file|that|find|und(o)*|kit(t(i|y)?)?o(w)?|thar(u)?(o)*w?|kittum(o)*|aya(k)*(um(o)*)?|full\smovie|any(one)|with\ssubtitle(s)?)",
         "", message.text, flags=re.IGNORECASE)
-    query = query.strip() + " movie"
+    
+    # "movie" শব্দটি জোর করে অ্যাড করা বাদ দিয়েছি যাতে Series গুলো ঠিকমত আসে
+    query = query.strip()
+    
+    # যদি সব ক্লিন করার পর কিছু না থাকে, তাহলে মেইন মেসেজটাই সার্চ হবে
+    if not query:
+        query = search
+
     try:
-        movies = await get_poster(search, bulk=True)
+        # ভুল: movies = await get_poster(search, bulk=True)  <-- আগে এটা ছিল (সমস্যা)
+        # সঠিক: নিচে query ব্যবহার করা হয়েছে (ক্লিন করা নাম)
+        movies = await get_poster(query, bulk=True) 
     except:
         k = await message.reply(script.I_CUDNT.format(message.from_user.mention))
         await asyncio.sleep(60)
@@ -2100,6 +2111,7 @@ async def advantage_spell_chok(client, message):
         except:
             pass
         return
+
     if not movies:
         google = search.replace(" ", "+")
         
@@ -2130,7 +2142,8 @@ async def advantage_spell_chok(client, message):
                     f"<b>#New_Request (No Results)</b>\n\n"
                     f"👤 <b>User:</b> {user_mention}\n"
                     f"🆔 <b>ID:</b> <code>{user_id}</code>\n"
-                    f"🔍 <b>Query:</b> <code>{search}</code>\n\n"
+                    f"🔍 <b>Query:</b> <code>{search}</code>\n"
+                    f"🧹 <b>Cleaned:</b> <code>{query}</code>\n\n"
                     f"👇 <b>Admin Action:</b>"
                 ),
                 reply_markup=InlineKeyboardMarkup(admin_btns)
@@ -2153,6 +2166,8 @@ async def advantage_spell_chok(client, message):
         return
 
     user = message.from_user.id if message.from_user else 0
+    
+    # বাটনে মুভির নামগুলো দেখানো হচ্ছে
     buttons = [
         [InlineKeyboardButton(text=movie.get('title'), callback_data=f"spol#{movie.movieID}#{user}")
          ] for movie in movies]
