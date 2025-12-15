@@ -6,7 +6,7 @@ from urllib.parse import quote_plus
 import logging
 from database.ia_filterdb import Media, Media2, get_file_details, get_search_results, get_bad_files
 from database.config_db import mdb
-from database.notify_db import notify_db  # <--- NEW IMPORT ADDED
+from database.notify_db import notify_db  # <--- NEW IMPORT
 from pyrogram.errors import FloodWait, UserIsBlocked, MessageNotModified, PeerIdInvalid, ChatAdminRequired, UserNotParticipant
 from pyrogram import Client, filters, enums
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, InputMediaPhoto, WebAppInfo
@@ -97,7 +97,7 @@ async def pm_text(bot, message):
             await message.reply_text(
                 text=(
                     f"<b>🙋 ʜᴇʏ {user} 😍 ,\n\n"
-                    "𝒀𝒐𝒖 𝒄𝒂𝒏 𝒔𝒆𝒂𝒓𝒄𝒉 𝒇𝒐𝒓 𝒎𝒐𝒗𝒊𝒆𝒔 𝒐𝒏𝒍𝒚 𝒐𝒏 𝒐𝒖𝒓 𝑴𝒐𝒗𝒊𝒆 𝑮𝒓𝒐𝒖𝒑. 𝒀𝒐𝒖 𝒂𝒓𝒆 𝒏𝒐𝒕 𝒂𝒍𝒍𝒐𝒘𝒆𝒅 𝒕𝒐 𝒔𝒆𝒂𝒓𝒄𝒉 𝒇𝒐𝒓 𝒎𝒐𝒗𝒊𝒆𝒔 𝒐𝒏 𝑫𝒊𝒓𝒆𝒄𝒕 𝑩𝒐𝒕. 𝑷𝒍𝒆𝒂𝒔𝒆 𝒋𝒐𝒊𝒏 𝒐𝒖𝒓 𝒎𝒐𝒗𝒊𝒆 𝒈𝒓𝒐𝒖𝒑 𝒃𝒚 𝒄𝒍𝒊𝒄𝒌𝒊𝒏𝒈 𝒐𝒏 𝒕𝒉𝒆  𝑹𝑬𝑸𝑼𝑬𝑺𝑻 𝑯𝑬𝑹𝑬 𝒃𝒖𝒕𝒕𝒐𝒏 𝒈𝒊𝒗𝒆𝒏 𝒃𝒆𝒍𝒐𝒘 𝒂𝒏𝒅 𝒔𝒆𝒂𝒓𝒄𝒉 𝒚𝒐𝒖𝒓 𝒇𝒂𝒗ᴏ𝒓𝒊𝒕𝒆 𝒎𝒐𝒗𝒊𝒆 𝒕𝒉𝒆𝒓𝒆 👇\n\n"
+                    "𝒀𝒐𝒖 𝒄𝒂𝒏 𝒔𝒆𝒂𝒓𝒄𝒉 𝒇𝒐𝒓 𝒎𝒐𝒗𝒊𝒆𝒔 𝒐𝒏𝒍𝒚 𝒐𝒏 𝒐𝒖𝒓 𝑴𝒐𝒗𝒊𝒆 𝑮𝒓𝒐𝒖𝒑. 𝒀𝒐𝒖 𝒂𝒓𝒆 𝒏𝒐𝒕 ᴀ𝒍𝒍𝒐𝒘𝒆𝒅 𝒕𝒐 𝒔𝒆𝒂𝒓𝒄𝒉 𝒇𝒐𝒓 𝒎𝒐𝒗𝒊𝒆𝒔 𝒐𝒏 𝑫𝒊𝒓𝒆𝒄𝒕 𝑩𝒐𝒕. 𝑷𝒍𝒆𝒂𝒔𝒆 𝒋𝒐𝒊𝒏 𝒐𝒖𝒓 𝒎𝒐𝒗𝒊𝒆 𝒈𝒓𝒐𝒖𝒑 𝒃𝒚 𝒄𝒍𝒊𝒄𝒌𝒊𝒏𝒈 𝒐𝒏 𝒕𝒉𝒆  𝑹𝑬𝑸𝑼𝑬𝑺𝑻 𝑯𝑬𝑹𝑬 𝒃𝒖𝒕𝒕𝒐𝒏 𝒈𝒊𝒗𝒆𝒏 𝒃𝒆𝒍𝒐𝒘 𝒂𝒏𝒅 𝒔𝒆𝒂𝒓𝒄𝒉 𝒚𝒐𝒖𝒓 𝒇𝒂𝒗ᴏ𝒓𝒊𝒕𝒆 𝒎𝒐𝒗𝒊𝒆 𝒕𝒉𝒆𝒓𝒆 👇\n\n"
                     "<blockquote>"
                     "আপনি শুধুমাত্র আমাদের 𝑴𝒐𝒗𝒊𝒆 𝑮𝒓𝒐𝒖𝒑-এ 𝑴𝒐𝒗𝒊𝒆 𝑺𝒆𝒂𝒓𝒄𝒉 করতে পারবেন। "
                     "আপনার 𝑫𝒊𝒓𝒆𝒄𝒕 𝑩𝒐𝒕-এ 𝑴𝒐𝒗𝒊𝒆 𝑺𝒆𝒂𝒓𝒄𝒉 করার 𝑷𝒆𝒓𝒎𝒊𝒔𝒔𝒊𝒐𝒏 নেই। অনুগ্রহ করে নিচে দেওয়া 𝑹𝑬𝑸𝑼𝑬𝑺𝑻 𝑯𝑬𝑹𝑬 বাটনে ক্লিক করে আমাদের 𝑴𝒐𝒗𝒊𝒆 𝑮𝒓𝒐𝒖𝒑-এ 𝑱𝒐𝒊𝒏 করুন এবং সেখানে আপনার পছন্দের 𝑴𝒐𝒗𝒊𝒆 𝑺𝒆𝒂𝒓𝒄𝒉 করুন।"
@@ -365,10 +365,28 @@ async def advantage_spoll_choker(bot, query):
         reqstr = await bot.get_users(reqstr1)
         if NO_RESULTS_MSG:
             try:
-                await bot.send_message(chat_id=BIN_CHANNEL, text=script.NORSLTS.format(reqstr.id, reqstr.mention, movie))
+                # ------------------- LOG CHANNEL ADMIN BUTTONS (SPOL) -------------------
+                user_id = reqstr.id
+                user_mention = reqstr.mention
+                admin_btns = [
+                    [
+                        InlineKeyboardButton("✅ Uploaded", callback_data=f"uploaded#{user_id}"),
+                        InlineKeyboardButton("🚫 Not Released", callback_data=f"Not_Released#{user_id}")
+                    ],
+                    [
+                        InlineKeyboardButton("📝 Wrong Spelling", callback_data=f"Type_Correct_Spelling#{user_id}"),
+                        InlineKeyboardButton("❌ Unavailable", callback_data=f"unavailable#{user_id}")
+                    ]
+                ]
+                await bot.send_message(
+                    chat_id=BIN_CHANNEL, 
+                    text=script.NORSLTS.format(user_id, user_mention, movie) + "\n\n👇 <b>Select Action:</b>",
+                    reply_markup=InlineKeyboardMarkup(admin_btns)
+                )
             except Exception as e:
-                print(f"Error In Spol - {e}   Make Sure Bot Admin BIN CHANNEL")
-        # ------------------- NEW NOTIFY BUTTON -------------------
+                print(f"Error In Spol Log - {e}")
+
+        # ------------------- NEW NOTIFY BUTTON FOR USER -------------------
         btn = InlineKeyboardMarkup([
             [InlineKeyboardButton("🔔 Notify Me When Available 🔔", callback_data=f"notify_me#{movie}")],
             [InlineKeyboardButton("🔰Cʟɪᴄᴋ ʜᴇʀᴇ & ʀᴇǫᴜᴇsᴛ ᴛᴏ ᴀᴅᴍɪɴ🔰", url=OWNER_LNK)]
@@ -854,28 +872,24 @@ async def cb_handler(client: Client, query: CallbackQuery):
         except:
             pass
     
-    # ------------------- NOTIFY CALLBACKS -------------------
+    # ------------------- NOTIFY CALLBACKS (NEW) -------------------
     elif query.data.startswith("notify_me"):
         try:
-            # Extract query from callback data
             query_text = query.data.split("#", 1)[1]
             user_id = query.from_user.id
-            
-            # Save to database
             if await notify_db.add_notify(user_id, query_text):
-                await query.answer("✅ রিকোয়েস্ট গ্রহণ করা হয়েছে! মুভিটি আপলোড হলে আপনাকে জানানো হবে।", show_alert=True)
-                # Change button to indicate success
+                await query.answer("✅ Request Accepted! You will be notified when uploaded.", show_alert=True)
                 btn = [[InlineKeyboardButton("✅ You will be Notified", callback_data="already_notified")]]
                 await query.message.edit_reply_markup(InlineKeyboardMarkup(btn))
             else:
-                await query.answer("⚠️ আপনি ইতিমধ্যে এই মুভিটির জন্য রিকোয়েস্ট করেছেন।", show_alert=True)
+                await query.answer("⚠️ You already requested this movie.", show_alert=True)
         except Exception as e:
             logger.error(f"Error in notify_me: {e}")
             await query.answer("Something went wrong!", show_alert=True)
 
     elif query.data == "already_notified":
-        await query.answer("অপেক্ষা করুন, আমরা মুভিটি আপলোড করার চেষ্টা করছি।", show_alert=True)
-    # --------------------------------------------------------
+        await query.answer("Please wait, we are trying to upload.", show_alert=True)
+    # -------------------------------------------------------------
 
     elif query.data == "pages":
         await query.answer("ᴛʜɪs ɪs ᴘᴀɢᴇs ʙᴜᴛᴛᴏɴ 😅")
@@ -2076,6 +2090,41 @@ async def advantage_spell_chok(client, message):
         return
     if not movies:
         google = search.replace(" ", "+")
+        
+        # ------------------- LOG CHANNEL ADMIN BUTTONS (NO RESULTS) -------------------
+        if NO_RESULTS_MSG:
+            try:
+                user_id = message.from_user.id
+                user_mention = message.from_user.mention
+                
+                # অ্যাডমিনদের জন্য কন্ট্রোল বাটন
+                admin_btns = [
+                    [
+                        InlineKeyboardButton("✅ Uploaded", callback_data=f"uploaded#{user_id}"),
+                        InlineKeyboardButton("🚫 Not Released", callback_data=f"Not_Released#{user_id}")
+                    ],
+                    [
+                        InlineKeyboardButton("📝 Wrong Spelling", callback_data=f"Type_Correct_Spelling#{user_id}"),
+                        InlineKeyboardButton("❌ Unavailable", callback_data=f"unavailable#{user_id}")
+                    ]
+                ]
+                
+                # লগ চ্যানেলে মেসেজ পাঠানো
+                await client.send_message(
+                    chat_id=BIN_CHANNEL,
+                    text=(
+                        f"<b>#No_Results_Found</b>\n\n"
+                        f"👤 <b>User:</b> {user_mention}\n"
+                        f"🆔 <b>ID:</b> <code>{user_id}</code>\n"
+                        f"🔍 <b>Query:</b> {search}\n\n"
+                        f"👇 <b>Select Action for this User:</b>"
+                    ),
+                    reply_markup=InlineKeyboardMarkup(admin_btns)
+                )
+            except Exception as e:
+                print(f"Log Channel Error: {e}")
+        # ------------------------------------------------------------------
+
         # ------------------- NEW NOTIFY BUTTON -------------------
         button = [
             [InlineKeyboardButton("🔔 Notify Me When Available 🔔", callback_data=f"notify_me#{search}")],
@@ -2089,6 +2138,7 @@ async def advantage_spell_chok(client, message):
         except:
             pass
         return
+
     user = message.from_user.id if message.from_user else 0
     buttons = [
         [InlineKeyboardButton(text=movie.get('title'), callback_data=f"spol#{movie.movieID}#{user}")
