@@ -114,8 +114,8 @@ async def start(client, message):
                 InlineKeyboardButton('📚 ʜᴇʟᴘ & ɢᴜɪᴅᴇ', callback_data='help')
             ],
             [
-                InlineKeyboardButton('💎 ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ', callback_data="premium_info"),
-                InlineKeyboardButton('💰 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="refferal_info")
+                InlineKeyboardButton('💎 ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ', callback_data="buy_premium_final"),
+                InlineKeyboardButton('🎁 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="refferal_info")
             ],
             [
                 InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇꜱ', url=UPDATE_CHNL_LNK),
@@ -157,8 +157,8 @@ async def start(client, message):
                 InlineKeyboardButton('📚 ʜᴇʟᴘ & ɢᴜɪᴅᴇ', callback_data='help')
             ],
             [
-                InlineKeyboardButton('💎 ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ', callback_data="premium_info"),
-                InlineKeyboardButton('💰 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="refferal_info")
+                InlineKeyboardButton('💎 ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ', callback_data="buy_premium_final"),
+                InlineKeyboardButton('🎁 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="refferal_info")
             ],
             [
                 InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇꜱ', url=UPDATE_CHNL_LNK),
@@ -187,7 +187,7 @@ async def start(client, message):
         )
         return
 
-    # --- Updated Referral Logic (3, 5, 10 Friends) ---
+    # --- UPDATED REFERRAL LOGIC (3, 5, 10 Friends) ---
     if message.command[1].startswith("reff_"):
         try:
             referrer_id = int(message.command[1].split("_")[1])
@@ -219,11 +219,6 @@ async def start(client, message):
         current_points = referdb.get_refer_points(referrer_id) + 10
         referdb.add_refer_points(referrer_id, current_points)
         
-        # Calculate Rewards based on points (1 user = 10 points)
-        # 3 Friends = 30 points -> 10 Days
-        # 5 Friends = 50 points -> 15 Days
-        # 10 Friends = 100 points -> 30 Days
-        
         add_days = 0
         reward_msg = ""
         
@@ -236,8 +231,6 @@ async def start(client, message):
         elif current_points == 100:
             add_days = 30
             reward_msg = f"🎉 অবিশ্বাস্য {referrer.mention}! আপনি ১০ জন বন্ধুকে ইনভাইট করে **১ মাসের ফ্রি প্রিমিয়াম** পেয়েছেন!"
-            # Optional: Reset points after max reward if you want cyclic rewards
-            # referdb.add_refer_points(referrer_id, 0)
 
         # Notify New User
         await message.reply_text(f"✅ আপনি সফলভাবে {referrer.mention} এর মাধ্যমে জয়েন করেছেন!")
@@ -247,8 +240,7 @@ async def start(client, message):
             seconds = add_days * 24 * 3600
             expiry_time = datetime.now() + timedelta(seconds=seconds)
             
-            # Check if user already has premium, add time if yes (Requires DB support)
-            # Simple implementation: Set new expiry
+            # Update User Expiry
             user_data = {"id": referrer_id, "expiry_time": expiry_time}
             await db.update_user(user_data)
             
@@ -269,7 +261,7 @@ async def start(client, message):
             )
         return
 
-    # --- Updated Premium Command ---
+    # --- Premium Command ---
     if len(message.command) == 2 and message.command[1] in ["premium"]:
         buttons = [[
                     InlineKeyboardButton('📲 অ্যাডমিনকে মেসেজ দিন', url="https://t.me/ctgmovies23")
@@ -277,7 +269,6 @@ async def start(client, message):
                     InlineKeyboardButton('❌ ᴄʟᴏꜱᴇ ❌', callback_data='close_data')
                   ]]
         reply_markup = InlineKeyboardMarkup(buttons)
-        # Using the updated Script class format
         await message.reply_photo(
             photo=(SUBSCRIPTION),
             caption=script.PREPLANS_TXT.format(message.from_user.mention, "অ্যাডমিনের কাছ থেকে নাম্বার নিন", QR_CODE),
@@ -286,7 +277,7 @@ async def start(client, message):
         )
         return  
     
-    # --- Other /start Logic (GetFile, etc.) ---
+    # --- Other /start Logic (GetFile) ---
     if len(message.command) == 2 and message.command[1].startswith('getfile'):
         movies = message.command[1].split("-", 1)[1] 
         movie = movies.replace('-',' ')
@@ -301,7 +292,6 @@ async def start(client, message):
     except:
         _, grp_id, file_id = "", 0, data
 
-    # Fetch file details concurrently with user checks
     file_details_task = asyncio.create_task(get_file_details(file_id))
 
     if not await db.has_premium_access(message.from_user.id): 
@@ -342,6 +332,7 @@ async def start(client, message):
 
 
     user_id = m.from_user.id
+    # --- VERIFICATION BLOCK WITH NEW BUTTONS ---
     if not await db.has_premium_access(user_id):
         try:
             grp_id = int(grp_id)
@@ -361,11 +352,18 @@ async def start(client, message):
                     howtodownload = settings.get('tutorial_3', TUTORIAL_3)
                 else:
                     howtodownload = settings.get('tutorial_2', TUTORIAL_2) if is_second_shortener else settings.get('tutorial', TUTORIAL)
-                buttons = [[
-                    InlineKeyboardButton(text="♻️ ᴄʟɪᴄᴋ ʜᴇʀᴇ ᴛᴏ ᴠᴇʀɪꜰʏ ♻️", url=verify)
-                ],[
-                    InlineKeyboardButton(text="⁉️ ʜᴏᴡ ᴛᴏ ᴠᴇʀɪꜰʏ ⁉️", url=howtodownload)
-                ]]
+                
+                # --- UPDATED BUTTONS FOR VERIFICATION MESSAGE ---
+                buttons = [
+                    [InlineKeyboardButton(text="♻️ ক্লিক করে ভেরিফাই করুন ♻️", url=verify)],
+                    [InlineKeyboardButton(text="⁉️ ভিডিও দেখুন (Tutorial) ⁉️", url=howtodownload)],
+                    [
+                        InlineKeyboardButton(text="💎 Buy Premium", callback_data="buy_premium_final"),
+                        InlineKeyboardButton(text="🎁 Earn Free VIP", callback_data="refferal_info")
+                    ]
+                ]
+                # ------------------------------------------------
+
                 reply_markup=InlineKeyboardMarkup(buttons)
                 if await db.user_verified(user_id): 
                     msg = script.THIRDT_VERIFICATION_TEXT
@@ -521,7 +519,6 @@ async def stream_buttons(user_id: int, file_id: str):
     else:
         return [[InlineKeyboardButton('📌 ᴊᴏɪɴ ᴜᴘᴅᴀᴛᴇꜱ ᴄʜᴀɴɴᴇʟ 📌', url=UPDATE_CHNL_LNK)]]
 
-# --- NEW INVITE COMMAND ---
 @Client.on_message(filters.command("invite") & filters.private)
 async def invite_link(client, message):
     link = f"https://t.me/{temp.U_NAME}?start=reff_{message.from_user.id}"
@@ -1487,3 +1484,47 @@ async def remove_fsub(client, message):
     except Exception as e:
         print(f"[ERROR] remove_fsub: {e}")
         await message.reply_text(f"⚠️ ᴀɴ ᴇʀʀᴏʀ ᴏᴄᴄᴜʀʀᴇᴅ: {e}")
+
+# --- Callback Query for Referral Info with Count ---
+@Client.on_callback_query(filters.regex("refferal_info"))
+async def refferal_info_callback(client, callback_query):
+    user_id = callback_query.from_user.id
+    
+    # পয়েন্ট চেক করা হচ্ছে (১০ পয়েন্ট = ১ জন বন্ধু)
+    current_points = referdb.get_refer_points(user_id)
+    invited_friends = current_points // 10  # ১০ দিয়ে ভাগ করে বন্ধুর সংখ্যা বের করা
+    
+    # আপনার দেওয়া সুন্দর বাংলা টেক্সট
+    text = script.FREE_TXT.format(callback_query.from_user.mention)
+    
+    # কাউন্ট স্ট্যাটাস যুক্ত করা
+    status_text = f"\n\n📊 <b>আপনার বর্তমান স্ট্যাটাস:</b>\n👥 টোটাল ইনভাইট: <b>{invited_friends} জন</b>\n💎 টোটাল পয়েন্ট: <b>{current_points}</b>\n\n👇 নিচের লিংকটি কপি করে শেয়ার করুন:"
+    
+    # নতুন মেসেজ তৈরি
+    final_text = text + status_text
+    
+    # রেফার লিংক জেনারেট
+    link = f"https://t.me/{temp.U_NAME}?start=reff_{user_id}"
+    btn = [[
+        InlineKeyboardButton("🔗 লিংক শেয়ার করুন", url=f"https://t.me/share/url?url={link}&text=Join%20this%20amazing%20bot%20to%20download%20movies!"),
+        InlineKeyboardButton("🔙 ব্যাকে যান", callback_data="buy_premium_final")
+    ]]
+    
+    await callback_query.message.edit_text(
+        text=final_text,
+        reply_markup=InlineKeyboardMarkup(btn),
+        disable_web_page_preview=True
+    )
+
+@Client.on_callback_query(filters.regex("buy_premium_final"))
+async def buy_premium_callback(client, callback_query):
+    buttons = [[
+        InlineKeyboardButton('📲 অ্যাডমিনকে মেসেজ দিন', url="https://t.me/ctgmovies23")
+    ],[
+        InlineKeyboardButton('🔙 ব্যাকে যান', callback_data="refferal_info")
+    ]]
+    await callback_query.message.edit_text(
+        text=script.PREPLANS_TXT.format(callback_query.from_user.mention, "অ্যাডমিনের কাছ থেকে নাম্বার নিন", QR_CODE),
+        reply_markup=InlineKeyboardMarkup(buttons),
+        disable_web_page_preview=True
+    )
