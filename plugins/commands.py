@@ -7,9 +7,10 @@ import random
 import asyncio
 import string
 import pytz
+import datetime
 from .pmfilter import auto_filter 
 from Script import script
-from datetime import datetime
+from datetime import timedelta, datetime
 from database.refer import referdb
 from database.config_db import mdb
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, Message, ReplyKeyboardMarkup
@@ -102,7 +103,7 @@ async def start(client, message):
         await db.add_user(message.from_user.id, message.from_user.first_name)
         await client.send_message(LOG_CHANNEL, script.LOG_TEXT_P.format(message.from_user.id, message.from_user.mention))
     
-    # --- Main Start Buttons (UPDATED) ---
+    # --- Main Start Buttons ---
     if len(message.command) != 2:
         buttons = [
             [
@@ -114,7 +115,7 @@ async def start(client, message):
             ],
             [
                 InlineKeyboardButton('💎 ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ', callback_data="premium_info"),
-                InlineKeyboardButton('💰 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="premium_info")
+                InlineKeyboardButton('💰 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="refferal_info")
             ],
             [
                 InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇꜱ', url=UPDATE_CHNL_LNK),
@@ -123,7 +124,6 @@ async def start(client, message):
         ]
         reply_markup = InlineKeyboardMarkup(buttons)
         
-        # Time Greeting
         current_time = datetime.now(pytz.timezone(TIMEZONE))
         curr_time = current_time.hour        
         if curr_time < 12:
@@ -146,7 +146,7 @@ async def start(client, message):
         )
         return
 
-    # --- Start with Parameters (subscribe, help, etc) ---
+    # --- Start with Parameters ---
     if len(message.command) == 2 and message.command[1] in ["subscribe", "error", "okay", "help"]:
         buttons = [
             [
@@ -158,7 +158,7 @@ async def start(client, message):
             ],
             [
                 InlineKeyboardButton('💎 ʙᴜʏ ᴘʀᴇᴍɪᴜᴍ', callback_data="premium_info"),
-                InlineKeyboardButton('💰 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="premium_info")
+                InlineKeyboardButton('💰 ᴇᴀʀɴ ꜰʀᴇᴇ ᴠɪᴘ', callback_data="refferal_info")
             ],
             [
                 InlineKeyboardButton('📢 ᴜᴘᴅᴀᴛᴇꜱ', url=UPDATE_CHNL_LNK),
@@ -187,64 +187,106 @@ async def start(client, message):
         )
         return
 
-    # --- Referral Logic ---
+    # --- Updated Referral Logic (3, 5, 10 Friends) ---
     if message.command[1].startswith("reff_"):
         try:
-            user_id = int(message.command[1].split("_")[1])
+            referrer_id = int(message.command[1].split("_")[1])
         except ValueError:
             await message.reply_text("Invalid refer!")
             return
-        if user_id == message.from_user.id:
-            await message.reply_text("Hᴇʏ Dᴜᴅᴇ, Yᴏᴜ Cᴀɴ'ᴛ Rᴇғᴇʀ Yᴏᴜʀsᴇʟғ 🤣!\n\nsʜᴀʀᴇ ʟɪɴᴋ ʏᴏᴜʀ ғʀɪᴇɴᴅ ᴀɴᴅ ɢᴇᴛ 10 ʀᴇғᴇʀʀᴀʟ ᴘᴏɪɴᴛ ɪғ ʏᴏᴜ ᴀʀᴇ ᴄᴏʟʟᴇᴄᴛɪɴɢ 100 ʀᴇғᴇʀʀᴀʟ ᴘᴏɪɴᴛs ᴛʜᴇɴ ʏᴏᴜ ᴄᴀɴ ɢᴇᴛ 1 ᴍᴏɴᴛʜ ғʀᴇᴇ ᴘʀᴇᴍɪᴜᴍ ᴍᴇᴍʙᴇʀsʜɪᴘ.")
-            return
-        if referdb.is_user_in_list(message.from_user.id):
-            await message.reply_text("Yᴏᴜ ʜᴀᴠᴇ ʙᴇᴇɴ ᴀʟʀᴇᴀᴅʏ ɪɴᴠɪᴛᴇᴅ ❗")
-            return
-        if await db.is_user_exist(message.from_user.id): 
-            await message.reply_text("‼️ Yᴏᴜ Hᴀᴠᴇ Bᴇᴇɴ Aʟʀᴇᴀᴅʏ Iɴᴠɪᴛᴇᴅ ᴏʀ Jᴏɪɴᴇᴅ")
-            return 
-        try:
-            uss = await client.get_users(user_id)
-        except Exception:
-            return 	    
-        referdb.add_user(message.from_user.id)
-        fromuse = referdb.get_refer_points(user_id) + 10
-        if fromuse == 100:
-            referdb.add_refer_points(user_id, 0) 
-            await message.reply_text(f"🎉 𝗖𝗼𝗻𝗴𝗿𝗮𝘁𝘂𝗹𝗮𝘁𝗶𝗼𝗻𝘀! 𝗬𝗼𝘂 𝘄𝗼𝗻 𝟭𝟬 𝗥𝗲𝗳𝗲𝗿𝗿𝗮𝗹 𝗽𝗼𝗶𝗻𝘁 𝗯𝗲𝗰𝗮𝘂𝘀𝗲 𝗬𝗼𝘂 𝗵𝗮𝘃𝗲 𝗯𝗲𝗲𝗻 𝗦𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆 𝗜𝗻𝘃𝗶𝘁𝗲𝗱 ☞ {uss.mention}!")		    
-            await message.reply_text(user_id, f"You have been successfully invited by {message.from_user.mention}!") 	
-            seconds = 2592000
-            if seconds > 0:
-                expiry_time = datetime.datetime.now() + datetime.timedelta(seconds=seconds)
-                user_data = {"id": user_id, "expiry_time": expiry_time}  # Using "id" instead of "user_id"  
-                await db.update_user(user_data)  # Use the update_user method to update or insert user data		    
-                await client.send_message(
-                chat_id=user_id,
-                text=f"<b>Hᴇʏ {uss.mention}\n\nYᴏᴜ ɢᴏᴛ 1 ᴍᴏɴᴛʜ ᴘʀᴇᴍɪᴜᴍ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ʙʏ ɪɴᴠɪᴛɪɴɢ 10 ᴜsᴇʀs ❗", disable_web_page_preview=True              
-                )
-            for admin in ADMINS:
-                await client.send_message(chat_id=admin, text=f"Sᴜᴄᴄᴇss ғᴜʟʟʏ ᴛᴀsᴋ ᴄᴏᴍᴘʟᴇᴛᴇᴅ ʙʏ ᴛʜɪs ᴜsᴇʀ:\n\nuser Nᴀᴍᴇ: {uss.mention}\n\nUsᴇʀ ɪᴅ: {uss.id}!")	
-        else:
-            referdb.add_refer_points(user_id, fromuse)
-            await message.reply_text(f"You have been successfully invited by {uss.mention}!")
-            await client.send_message(user_id, f"𝗖𝗼𝗻𝗴𝗿𝗮𝘁𝘂𝗹𝗮𝘁𝗶𝗼𝗻𝘀! 𝗬𝗼𝘂 𝘄𝗼𝗻 𝟭𝟬 𝗥𝗲𝗳𝗲𝗿𝗿𝗮𝗹 𝗽𝗼𝗶𝗻𝘁 𝗯𝗲𝗰𝗮𝘂𝘀𝗲 𝗬𝗼𝘂 𝗵𝗮𝘃𝗲 𝗯𝗲𝗲𝗻 𝗦𝘂𝗰𝗰𝗲𝘀𝘀𝗳𝘂𝗹𝗹𝘆 𝗜𝗻𝘃𝗶𝘁𝗲𝗱 ☞{message.from_user.mention}!")
-        return
         
+        if referrer_id == message.from_user.id:
+            await message.reply_text("‼️ আপনি নিজেকে রেফার করতে পারবেন না!")
+            return
+        
+        if referdb.is_user_in_list(message.from_user.id):
+            await message.reply_text("‼️ আপনি ইতিমধ্যে আমন্ত্রিত হয়েছেন!")
+            return
+        
+        if await db.is_user_exist(message.from_user.id): 
+            await message.reply_text("‼️ আপনি ইতিমধ্যে বটের ইউজার!")
+            return 
+        
+        try:
+            referrer = await client.get_users(referrer_id)
+        except Exception:
+            return 
+            
+        # Add new user to refer list
+        referdb.add_user(message.from_user.id)
+        
+        # Add points to referrer (10 points per invite)
+        current_points = referdb.get_refer_points(referrer_id) + 10
+        referdb.add_refer_points(referrer_id, current_points)
+        
+        # Calculate Rewards based on points (1 user = 10 points)
+        # 3 Friends = 30 points -> 10 Days
+        # 5 Friends = 50 points -> 15 Days
+        # 10 Friends = 100 points -> 30 Days
+        
+        add_days = 0
+        reward_msg = ""
+        
+        if current_points == 30:
+            add_days = 10
+            reward_msg = f"🎉 অভিনন্দন {referrer.mention}! আপনি ৩ জন বন্ধুকে ইনভাইট করে **১০ দিনের ফ্রি প্রিমিয়াম** পেয়েছেন!"
+        elif current_points == 50:
+            add_days = 15
+            reward_msg = f"🎉 অসাধারণ {referrer.mention}! আপনি ৫ জন বন্ধুকে ইনভাইট করে **১৫ দিনের ফ্রি প্রিমিয়াম** পেয়েছেন!"
+        elif current_points == 100:
+            add_days = 30
+            reward_msg = f"🎉 অবিশ্বাস্য {referrer.mention}! আপনি ১০ জন বন্ধুকে ইনভাইট করে **১ মাসের ফ্রি প্রিমিয়াম** পেয়েছেন!"
+            # Optional: Reset points after max reward if you want cyclic rewards
+            # referdb.add_refer_points(referrer_id, 0)
+
+        # Notify New User
+        await message.reply_text(f"✅ আপনি সফলভাবে {referrer.mention} এর মাধ্যমে জয়েন করেছেন!")
+        
+        # Process Reward for Referrer
+        if add_days > 0:
+            seconds = add_days * 24 * 3600
+            expiry_time = datetime.now() + timedelta(seconds=seconds)
+            
+            # Check if user already has premium, add time if yes (Requires DB support)
+            # Simple implementation: Set new expiry
+            user_data = {"id": referrer_id, "expiry_time": expiry_time}
+            await db.update_user(user_data)
+            
+            await client.send_message(
+                chat_id=referrer_id,
+                text=reward_msg,
+                disable_web_page_preview=True
+            )
+            
+            # Notify Admins
+            for admin in ADMINS:
+                await client.send_message(chat_id=admin, text=f"🎁 **Free Premium Claimed!**\n\nUser: {referrer.mention}\nID: `{referrer_id}`\nReward: {add_days} Days")
+        else:
+            # Just notify about points if no milestone hit
+            await client.send_message(
+                chat_id=referrer_id,
+                text=f"🥳 **New Referral!**\n\n{message.from_user.mention} আপনার লিংকে জয়েন করেছেন।\nবর্তমান পয়েন্ট: {current_points}\n\nআর মাত্র {30-current_points if current_points < 30 else (50-current_points if current_points < 50 else 100-current_points)} পয়েন্ট দরকার পরবর্তী রিওয়ার্ডের জন্য!"
+            )
+        return
+
+    # --- Updated Premium Command ---
     if len(message.command) == 2 and message.command[1] in ["premium"]:
         buttons = [[
-                    InlineKeyboardButton('📲 ꜱᴇɴᴅ ᴘᴀʏᴍᴇɴᴛ ꜱᴄʀᴇᴇɴꜱʜᴏᴛ', url=OWNER_LNK)
+                    InlineKeyboardButton('📲 অ্যাডমিনকে মেসেজ দিন', url="https://t.me/ctgmovies23")
                   ],[
                     InlineKeyboardButton('❌ ᴄʟᴏꜱᴇ ❌', callback_data='close_data')
                   ]]
         reply_markup = InlineKeyboardMarkup(buttons)
+        # Using the updated Script class format
         await message.reply_photo(
             photo=(SUBSCRIPTION),
-            caption=script.PREPLANS_TXT.format(message.from_user.mention, OWNER_UPI_ID, QR_CODE),
+            caption=script.PREPLANS_TXT.format(message.from_user.mention, "অ্যাডমিনের কাছ থেকে নাম্বার নিন", QR_CODE),
             reply_markup=reply_markup,
             parse_mode=enums.ParseMode.HTML
         )
         return  
     
+    # --- Other /start Logic (GetFile, etc.) ---
     if len(message.command) == 2 and message.command[1].startswith('getfile'):
         movies = message.command[1].split("-", 1)[1] 
         movie = movies.replace('-',' ')
@@ -478,6 +520,19 @@ async def stream_buttons(user_id: int, file_id: str):
             ]
     else:
         return [[InlineKeyboardButton('📌 ᴊᴏɪɴ ᴜᴘᴅᴀᴛᴇꜱ ᴄʜᴀɴɴᴇʟ 📌', url=UPDATE_CHNL_LNK)]]
+
+# --- NEW INVITE COMMAND ---
+@Client.on_message(filters.command("invite") & filters.private)
+async def invite_link(client, message):
+    link = f"https://t.me/{temp.U_NAME}?start=reff_{message.from_user.id}"
+    btn = [[
+        InlineKeyboardButton("🔗 Share Link", url=f"https://t.me/share/url?url={link}&text=Join%20this%20amazing%20bot%20to%20download%20movies!")
+    ]]
+    await message.reply_text(
+        script.FREE_TXT.format(message.from_user.mention),
+        reply_markup=InlineKeyboardMarkup(btn),
+        disable_web_page_preview=True
+    )
     
 @Client.on_message(filters.command('logs') & filters.user(ADMINS))
 async def log_file(bot, message):
