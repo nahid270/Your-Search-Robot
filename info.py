@@ -105,14 +105,14 @@ TUTORIAL_2 = environ.get("TUTORIAL_2", "https://t.me/HowtoDowlnoad/2")   # Secon
 TUTORIAL_3 = environ.get("TUTORIAL_3", "https://t.me/HowtoDowlnoad/2")   # Third tutorial link for verification
 
 # Verification (Must Fill All Veriables. Else You Got Error
-SHORTENER_API = environ.get("SHORTENER_API", "8490815a50aacac0e54269449473c73d4700e532") # Shortener API key
-SHORTENER_WEBSITE = environ.get("SHORTENER_WEBSITE", "teraboxlinks.com") # Shortener website
+SHORTENER_API = environ.get("SHORTENER_API", "e3686f3ba4226ca56b94a0faf3edf4f5273ba8c1") # Shortener API key
+SHORTENER_WEBSITE = environ.get("SHORTENER_WEBSITE", "nanolinks.in") # Shortener website
 
-SHORTENER_API2 = environ.get("SHORTENER_API2", "8490815a50aacac0e54269449473c73d4700e532")  # Shortener API key for second website
-SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "teraboxlinks.com") # Shortener website for second website
+SHORTENER_API2 = environ.get("SHORTENER_API2", "e3686f3ba4226ca56b94a0faf3edf4f5273ba8c1")  # Shortener API key for second website
+SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "nanolinks.in") # Shortener website for second website
 
-SHORTENER_API3 = environ.get("SHORTENER_API3", "8490815a50aacac0e54269449473c73d4700e532")  
-SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "teraboxlinks.com") # Shortener website for third website
+SHORTENER_API3 = environ.get("SHORTENER_API3", "e3686f3ba4226ca56b94a0faf3edf4f5273ba8c1")  
+SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "nanolinks.in") # Shortener website for third website
 
 TWO_VERIFY_GAP = int(environ.get('TWO_VERIFY_GAP', "1200")) # Time gap for two-step verification in seconds (default: 20 minutes)
 THREE_VERIFY_GAP = int(environ.get('THREE_VERIFY_GAP', "54000"))    
