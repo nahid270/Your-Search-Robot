@@ -114,7 +114,7 @@ SHORTENER_WEBSITE2 = environ.get("SHORTENER_WEBSITE2", "nanolinks.in") # Shorten
 SHORTENER_API3 = environ.get("SHORTENER_API3", "e3686f3ba4226ca56b94a0faf3edf4f5273ba8c1")  
 SHORTENER_WEBSITE3 = environ.get("SHORTENER_WEBSITE3", "nanolinks.in") # Shortener website for third website
 
-TWO_VERIFY_GAP = int(environ.get('TWO_VERIFY_GAP', "1200")) # Time gap for two-step verification in seconds (default: 20 minutes)
+TWO_VERIFY_GAP = int(environ.get('TWO_VERIFY_GAP', "21600")) # Time gap for two-step verification in seconds (default: 20 minutes)
 THREE_VERIFY_GAP = int(environ.get('THREE_VERIFY_GAP', "54000"))    
 
 # ============================
